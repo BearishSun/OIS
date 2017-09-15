@@ -1,0 +1,1 @@
+This is a slightly modified version of OIS 1.3 for the purposes of Banshee Engine. All the credits go to original authors (see ReadMe.txt for original license).

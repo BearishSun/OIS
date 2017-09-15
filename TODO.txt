@@ -1,0 +1,2 @@
+ - Non-Windows implementations of keyboard/mouse/joystick need to implement setCaptureContext method. This method was added primarily so I can capture input when user has changed focus to a child window.
+ - I removed all text input related methods/fields
