@@ -56,7 +56,7 @@ namespace OIS
 		virtual int getID() const {return mDevID;}
 
 		/**	@remarks Accepts a platform specific identifier which specifies the capture context (e.g. an active window handle) */
-		virtual void setCaptureContext(const std::string& source) = 0;
+		virtual void setCaptureContext(const std::string& source) { };
 
 		/**
 		@remarks

@@ -32,6 +32,7 @@ restrictions:
 
 #include <fcntl.h>        //Needed to Open a file descriptor
 #include <cassert>	
+#include <unistd.h>
 #include <linux/input.h>
 
 

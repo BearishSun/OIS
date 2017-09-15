@@ -120,7 +120,7 @@ void LinuxMouse::capture()
 	if( mMoved == true )
 	{
 		if( mBuffered && mListener )
-			mListener->mouseMoved( MouseEvent( this, mState ) );
+			mListener->mouseMoved( MouseEvent( this, mState, 0 ) );
 
 		mMoved = false;
 	}
@@ -220,7 +220,7 @@ void LinuxMouse::_processXEvents()
 			{
 				mState.buttons |= mask[event.xbutton.button];
 				if( mBuffered && mListener )
-					if( mListener->mousePressed( MouseEvent( this, mState ),
+					if( mListener->mousePressed( MouseEvent( this, mState, 0 ),
 						(MouseButtonID)(mask[event.xbutton.button] >> 1)) == false )
 						return;
 			}
@@ -231,7 +231,7 @@ void LinuxMouse::_processXEvents()
 			{
 				mState.buttons &= ~mask[event.xbutton.button];
 				if( mBuffered && mListener )
-					if( mListener->mouseReleased( MouseEvent( this, mState ),
+					if( mListener->mouseReleased( MouseEvent( this, mState, 0 ),
 						(MouseButtonID)(mask[event.xbutton.button] >> 1)) == false )
 						return;
 			}
