@@ -32,7 +32,7 @@ namespace OIS
 	class LinuxMouse : public Mouse
 	{
 	public:
-		LinuxMouse(InputManager* creator, bool buffered, bool grab, bool hide);
+		LinuxMouse(InputManager* creator, bool buffered);
 		virtual ~LinuxMouse();
 
 		/** @copydoc Object::setBuffered */
@@ -51,8 +51,6 @@ namespace OIS
 		/** @copydoc Object::_initialize */
 		virtual void _initialize();
 
-		void grab(bool grab);
-		void hide(bool hide);
 
 	protected:
 		void _processXEvents();
@@ -64,10 +62,7 @@ namespace OIS
 
 		Window window;		//The X Window
 		Display *display;	//The X display
-		Cursor cursor;		//A blank cursor
 
-		bool grabMouse;		//Are we grabbing the mouse to the window?
-		bool hideMouse;		//Are we hiding OS mouse?
 		bool mouseFocusLost;//Has the mouse just lost focus?
 	};
 }

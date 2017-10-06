@@ -28,15 +28,11 @@ restrictions:
 using namespace OIS;
 
 //-------------------------------------------------------------------//
-LinuxMouse::LinuxMouse(InputManager* creator, bool buffered, bool grab, bool hide)
+LinuxMouse::LinuxMouse(InputManager* creator, bool buffered)
 	: Mouse(creator->inputSystemName(), buffered, 0, creator)
 {
 	display = 0;
 	window = 0;
-	cursor = 0;
-
-	grabMouse = grab;
-	hideMouse = hide;
 
 	static_cast<LinuxInputManager*>(mCreator)->_setMouseUsed(true);
 }
@@ -68,20 +64,6 @@ void LinuxMouse::_initialize()
 	//Warp mouse inside window
 	XWarpPointer(display,None,window,0,0,0,0, 6,6);
 
-	//Create a blank cursor:
-	Pixmap bm_no;
-	XColor black, dummy;
-	Colormap colormap;
-	static char no_data[] = { 0,0,0,0,0,0,0,0 };
-
-	colormap = DefaultColormap( display, DefaultScreen(display) );
-	XAllocNamedColor( display, colormap, "black", &black, &dummy );
-	bm_no = XCreateBitmapFromData( display, window, no_data, 8, 8 );
-	cursor = XCreatePixmapCursor( display, bm_no, bm_no, &black, &black, 0, 0 );
-
-	grab( grabMouse );
-	hide( hideMouse );
-
 	mouseFocusLost = false;
 }
 
@@ -90,9 +72,6 @@ LinuxMouse::~LinuxMouse()
 {
 	if( display )
 	{
-		grab(false);
-		hide(false);
-		XFreeCursor(display, cursor);
 		XCloseDisplay(display);
 	}
 
@@ -123,29 +102,6 @@ void LinuxMouse::capture()
 			mListener->mouseMoved( MouseEvent( this, mState, 0 ) );
 
 		mMoved = false;
-	}
-
-	//Check for losing/gaining mouse grab focus (alt-tab, etc)
-	if( grabMouse )
-	{
-		if( static_cast<LinuxInputManager*>(mCreator)->_getGrabState() )
-		{
-			if( mouseFocusLost )	//We just regained mouse grab focus
-			{
-				grab( true );
-				hide( hideMouse );
-				mouseFocusLost = false;
-			}
-		}
-		else
-		{
-			if( mouseFocusLost == false )	//We just lost mouse grab focus
-			{
-				grab( false );
-				hide( false );
-				mouseFocusLost = true;
-			}
-		}
 	}
 }
 
@@ -184,32 +140,6 @@ void LinuxMouse::_processXEvents()
 			mState.X.rel += dx;
 			mState.Y.rel += dy;
 
-			//Check to see if we are grabbing the mouse to the window (requires clipping and warping)
-			if( grabMouse )
-			{
-				if( mState.X.abs < 0 )
-					mState.X.abs = 0;
-				else if( mState.X.abs > mState.width )
-					mState.X.abs = mState.width;
-
-				if( mState.Y.abs < 0 )
-					mState.Y.abs = 0;
-				else if( mState.Y.abs > mState.height )
-					mState.Y.abs = mState.height;
-
-				if( mouseFocusLost == false )
-				{
-					//Keep mouse in window (fudge factor)
-					if(event.xmotion.x < 5 || event.xmotion.x > mState.width - 5 ||
-					   event.xmotion.y < 5 || event.xmotion.y > mState.height - 5 )
-					{
-						oldXMouseX = mState.width >> 1;  //center x
-						oldXMouseY = mState.height >> 1; //center y
-						XWarpPointer(display, None, window, 0, 0, 0, 0, oldXMouseX, oldXMouseY);
-						mWarped = true;
-					}
-				}
-			}
 			mMoved = true;
 		}
 		else if( event.type == ButtonPress )
@@ -251,22 +181,4 @@ void LinuxMouse::_processXEvents()
 			}
 		}
 	}
-}
-
-//-------------------------------------------------------------------//
-void LinuxMouse::grab(bool grab)
-{
-	if( grab )
-		XGrabPointer(display, window, True, 0, GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
-	else
-		XUngrabPointer(display, CurrentTime);
-}
-
-//-------------------------------------------------------------------//
-void LinuxMouse::hide(bool hide)
-{
-	if( hide )
-		XDefineCursor(display, window, cursor);
-	else
-		XUndefineCursor(display, window);
 }

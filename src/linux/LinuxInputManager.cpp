@@ -171,7 +171,7 @@ Object* LinuxInputManager::createObject(InputManager *creator, Type iType, bool 
 	case OISMouse:
 	{
 		if( mouseUsed == false )
-			obj = new LinuxMouse(this, bufferMode, grabMouse, hideMouse);
+			obj = new LinuxMouse(this, bufferMode);
 		break;
 	}
 	case OISJoyStick:
